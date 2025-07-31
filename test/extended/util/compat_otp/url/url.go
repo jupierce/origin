@@ -15,7 +15,7 @@ import (
 
 	o "github.com/onsi/gomega"
 
-	exutil "github.com/openshift/openshift-tests-private/test/extended/util"
+	exutil "github.com/openshift/origin/test/extended/util/compat_otp"
 	v1 "k8s.io/api/core/v1"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

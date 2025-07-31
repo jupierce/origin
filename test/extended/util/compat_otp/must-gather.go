@@ -10,7 +10,7 @@ import (
 	"regexp"
 
 	g "github.com/onsi/ginkgo/v2"
-	logger "github.com/openshift/openshift-tests-private/test/extended/util/logext"
+	logger "github.com/openshift/origin/test/extended/util/compat_otp/logext"
 	e2e "k8s.io/kubernetes/test/e2e/framework"
 )
 

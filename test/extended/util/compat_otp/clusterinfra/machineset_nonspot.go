@@ -10,7 +10,7 @@ import (
 
 	g "github.com/onsi/ginkgo/v2"
 	o "github.com/onsi/gomega"
-	exutil "github.com/openshift/openshift-tests-private/test/extended/util"
+	exutil "github.com/openshift/origin/test/extended/util/compat_otp"
 	"github.com/tidwall/sjson"
 
 	"k8s.io/apimachinery/pkg/util/errors"

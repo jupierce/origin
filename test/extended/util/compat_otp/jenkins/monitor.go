@@ -12,7 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	e2e "k8s.io/kubernetes/test/e2e/framework"
 
-	exutil "github.com/openshift/openshift-tests-private/test/extended/util"
+	exutil "github.com/openshift/origin/test/extended/util/compat_otp"
 )
 
 // JobMon is a Jenkins job monitor

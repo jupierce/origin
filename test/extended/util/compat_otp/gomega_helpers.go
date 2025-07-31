@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/onsi/gomega/types"
-	logger "github.com/openshift/openshift-tests-private/test/extended/util/logext"
+	logger "github.com/openshift/origin/test/extended/util/compat_otp/logext"
 )
 
 var secureMatchesMessage = fmt.Sprintf(

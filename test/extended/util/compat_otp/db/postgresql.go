@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/openshift/openshift-tests-private/test/extended/util"
+	"github.com/openshift/origin/test/extended/util/compat_otp"
 )
 
 // PostgreSQL is a PostgreSQL helper for executing commands.

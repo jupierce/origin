@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/openshift/openshift-tests-private/test/extended/util"
+	"github.com/openshift/origin/test/extended/util/compat_otp"
 )
 
 // MongoDB is a MongoDB helper for executing commands.

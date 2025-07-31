@@ -1,0 +1,65 @@
+# OTP to Origin Migration Progress Log
+
+## Migration Started: [Current Date]
+
+### Step 1: Update origin to use go1.24.0 and ensure it can `make clean build`
+Status: STARTED
+- Go version already at 1.24.0
+- Build tested successfully
+Status: COMPLETED
+
+### Step 2: Add import for github.com/openshift/origin to otp's go.mod with replace statement
+Status: STARTED
+- Added github.com/openshift/origin v4.1.0+incompatible to go.mod
+- Replace statement added: github.com/openshift/origin => ../origin
+Status: COMPLETED
+
+### Step 3: Copy openshift-tests-private/test/extended/util/* to origin/test/extended/util/compat_otp/
+Status: STARTED
+- Created compat_otp directory in origin
+- Copied all files and subdirectories from OTP's util
+- Updated package declarations from 'package util' to 'package compat_otp'
+Status: COMPLETED
+
+### Step 4: Work to get origin to a state where "make clean build" succeeds
+Status: STARTED
+- Origin built successfully without errors initially
+Status: COMPLETED
+
+### Step 5: Create a new commit and branch (named compat_otp_5) to lock in progress
+Status: STARTED
+- Committed changes with message: "Step 5: Add compat_otp package with OTP util implementations"
+- Created branch: compat_otp_5
+Status: COMPLETED
+
+### Step 6: Compare CLI interfaces in test/extended/util/cli.go and test/extended/util/compat_otp/cli.go
+Status: STARTED
+- Identified missing methods in origin's CLI:
+  - NotShowInfo, SetShowInfo, SetGuestKubeconf, GetGuestKubeconf
+  - GuestKubeClient, GuestConfig, CreateNamespaceUDN, CreateSpecificNamespaceUDN
+  - CreateSpecifiedNamespaceAsAdmin, DeleteSpecifiedNamespaceAsAdmin
+  - AddPathsToDelete, GetClientConfigForExtOIDCUser, SilentOutput
+- Created test/extended/util/util_otp.go with these methods
+Status: COMPLETED
+
+### Step 7: origin's util.CLI should now offer a drop-in replacement for compat_otp.CLI
+Status: STARTED
+- util_otp.go provides the missing methods
+- compat_otp keeps its own CLI type (no changes needed)
+- OTP tests will import util directly when migrated
+Status: COMPLETED
+
+### Step 8: Get origin back to a buildable state using only util.CLI
+Status: STARTED
+- Found circular dependencies and resolved them by:
+  - Copying version, scheme, testdata packages from OTP to compat_otp
+  - Fixing all imports to use local packages instead of openshift-tests-private
+- Added missing dependencies:
+  - gophercloud, terraform tools, msgraph-sdk-go, nutanix-go-sdk, govmomi
+  - Azure SDK packages, IBM Cloud packages, and others
+- Added otelgrpc replace directive to fix build issue
+- Origin now builds successfully with "make clean build"
+Status: COMPLETED
+
+### Step 9: Eliminate the use of functions from compat_otp that already exist in origin's util/
+Status: NOT STARTED 

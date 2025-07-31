@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	logger "github.com/openshift/openshift-tests-private/test/extended/util/logext"
+	logger "github.com/openshift/origin/test/extended/util/compat_otp/logext"
 )
 
 type Version struct {

@@ -3,7 +3,7 @@ package rosacli
 import (
 	"bytes"
 
-	logger "github.com/openshift/openshift-tests-private/test/extended/util/logext"
+	logger "github.com/openshift/origin/test/extended/util/compat_otp/logext"
 	"gopkg.in/yaml.v3"
 )
 

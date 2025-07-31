@@ -31,9 +31,9 @@ import (
 	"github.com/openshift/library-go/pkg/config/helpers"
 	"github.com/openshift/library-go/pkg/crypto"
 
-	"github.com/openshift/openshift-tests-private/test/extended/testdata"
-	exutil "github.com/openshift/openshift-tests-private/test/extended/util"
-	"github.com/openshift/openshift-tests-private/test/extended/util/oauthserver/tokencmd"
+	"github.com/openshift/origin/test/extended/util/compat_otp/testdata"
+	exutil "github.com/openshift/origin/test/extended/util/compat_otp"
+	"github.com/openshift/origin/test/extended/util/compat_otp/oauthserver/tokencmd"
 )
 
 const (

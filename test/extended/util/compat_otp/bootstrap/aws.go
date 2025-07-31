@@ -3,8 +3,8 @@ package bootstrap
 import (
 	"os"
 
-	exutil "github.com/openshift/openshift-tests-private/test/extended/util"
-	clusterinfra "github.com/openshift/openshift-tests-private/test/extended/util/clusterinfra"
+	exutil "github.com/openshift/origin/test/extended/util/compat_otp"
+	clusterinfra "github.com/openshift/origin/test/extended/util/compat_otp/clusterinfra"
 	e2e "k8s.io/kubernetes/test/e2e/framework"
 )
 
