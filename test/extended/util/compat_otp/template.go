@@ -1,6 +1,5 @@
 package compat_otp
 
-
 import (
 	"fmt"
 	"math/rand"
@@ -10,6 +9,7 @@ import (
 	"time"
 
 	o "github.com/onsi/gomega"
+	util "github.com/openshift/origin/test/extended/util"
 
 	"github.com/ghodss/yaml"
 	"github.com/tidwall/pretty"
@@ -19,43 +19,43 @@ import (
 
 // ApplyClusterResourceFromTemplateWithError apply the changes to the cluster resource and return error if happned.
 // For ex: ApplyClusterResourceFromTemplateWithError(oc, "--ignore-unknown-parameters=true", "-f", "TEMPLATE LOCATION")
-func ApplyClusterResourceFromTemplateWithError(oc *CLI, parameters ...string) error {
+func ApplyClusterResourceFromTemplateWithError(oc *util.CLI, parameters ...string) error {
 	return resourceFromTemplate(oc, false, true, "", parameters...)
 }
 
 // ApplyClusterResourceFromTemplate apply the changes to the cluster resource.
 // For ex: ApplyClusterResourceFromTemplate(oc, "--ignore-unknown-parameters=true", "-f", "TEMPLATE LOCATION")
-func ApplyClusterResourceFromTemplate(oc *CLI, parameters ...string) {
+func ApplyClusterResourceFromTemplate(oc *util.CLI, parameters ...string) {
 	resourceFromTemplate(oc, false, false, "", parameters...)
 }
 
 // ApplyNsResourceFromTemplate apply changes to the ns resource.
 // No need to add a namespace parameter in the template file as it can be provided as a function argument.
 // For ex: ApplyNsResourceFromTemplate(oc, "NAMESPACE", "--ignore-unknown-parameters=true", "-f", "TEMPLATE LOCATION")
-func ApplyNsResourceFromTemplate(oc *CLI, namespace string, parameters ...string) {
+func ApplyNsResourceFromTemplate(oc *util.CLI, namespace string, parameters ...string) {
 	resourceFromTemplate(oc, false, false, namespace, parameters...)
 }
 
 // CreateClusterResourceFromTemplateWithError create resource from the template and return error if happened.
 // For ex: CreateClusterResourceFromTemplateWithError(oc, "--ignore-unknown-parameters=true", "-f", "TEMPLATE LOCATION")
-func CreateClusterResourceFromTemplateWithError(oc *CLI, parameters ...string) error {
+func CreateClusterResourceFromTemplateWithError(oc *util.CLI, parameters ...string) error {
 	return resourceFromTemplate(oc, true, true, "", parameters...)
 }
 
 // CreateClusterResourceFromTemplate create resource from the template.
 // For ex: CreateClusterResourceFromTemplate(oc, "--ignore-unknown-parameters=true", "-f", "TEMPLATE LOCATION")
-func CreateClusterResourceFromTemplate(oc *CLI, parameters ...string) {
+func CreateClusterResourceFromTemplate(oc *util.CLI, parameters ...string) {
 	resourceFromTemplate(oc, true, false, "", parameters...)
 }
 
 // CreateNsResourceFromTemplate create ns resource from the template.
 // No need to add a namespace parameter in the template file as it can be provided as a function argument.
 // For ex: CreateNsResourceFromTemplate(oc, "NAMESPACE", "--ignore-unknown-parameters=true", "-f", "TEMPLATE LOCATION")
-func CreateNsResourceFromTemplate(oc *CLI, namespace string, parameters ...string) {
+func CreateNsResourceFromTemplate(oc *util.CLI, namespace string, parameters ...string) {
 	resourceFromTemplate(oc, true, false, namespace, parameters...)
 }
 
-func resourceFromTemplate(oc *CLI, create bool, returnError bool, namespace string, parameters ...string) error {
+func resourceFromTemplate(oc *util.CLI, create bool, returnError bool, namespace string, parameters ...string) error {
 	var configFile string
 	err := wait.Poll(3*time.Second, 15*time.Second, func() (bool, error) {
 		fileName := GetRandomString() + "config.json"
@@ -110,7 +110,7 @@ func GetRandomString() string {
 }
 
 // ApplyResourceFromTemplateWithNonAdminUser to as normal user to create resource from template
-func ApplyResourceFromTemplateWithNonAdminUser(oc *CLI, parameters ...string) error {
+func ApplyResourceFromTemplateWithNonAdminUser(oc *util.CLI, parameters ...string) error {
 	var configFile string
 	err := wait.Poll(3*time.Second, 15*time.Second, func() (bool, error) {
 		output, err := oc.Run("process").Args(parameters...).OutputToFile(GetRandomString() + "config.json")
@@ -128,7 +128,7 @@ func ApplyResourceFromTemplateWithNonAdminUser(oc *CLI, parameters ...string) er
 }
 
 // ProcessTemplate process template given file path and parameters
-func ProcessTemplate(oc *CLI, parameters ...string) string {
+func ProcessTemplate(oc *util.CLI, parameters ...string) string {
 	var configFile string
 
 	err := wait.Poll(3*time.Second, 15*time.Second, func() (bool, error) {
@@ -147,7 +147,7 @@ func ProcessTemplate(oc *CLI, parameters ...string) string {
 }
 
 // ParameterizedTemplateByReplaceToFile parameterize template to new file
-func ParameterizedTemplateByReplaceToFile(oc *CLI, parameters ...string) string {
+func ParameterizedTemplateByReplaceToFile(oc *util.CLI, parameters ...string) string {
 	isParameterExist, pIndex := StringsSliceElementsHasPrefix(parameters, "-f", true)
 	o.Expect(isParameterExist).Should(o.BeTrue())
 	templateFileName := parameters[pIndex+1]

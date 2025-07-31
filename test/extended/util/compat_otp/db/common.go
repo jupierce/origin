@@ -40,7 +40,7 @@ func firstContainerName(c kcoreclient.PodInterface, podName string) (string, err
 	return pod.Spec.Containers[0].Name, nil
 }
 
-func isReady(oc *CLI, podName string, pingCommand, expectedOutput string) (bool, error) {
+func isReady(oc *util.CLI, podName string, pingCommand, expectedOutput string) (bool, error) {
 	out, err := executeShellCommand(oc, podName, pingCommand)
 	ok := strings.Contains(out, expectedOutput)
 	if !ok {
@@ -49,7 +49,7 @@ func isReady(oc *CLI, podName string, pingCommand, expectedOutput string) (bool,
 	return ok, err
 }
 
-func executeShellCommand(oc *CLI, podName string, command string) (string, error) {
+func executeShellCommand(oc *util.CLI, podName string, command string) (string, error) {
 	out, err := oc.Run("exec").Args(podName, "--", "bash", "-c", command).Output()
 	if err != nil {
 		switch err.(type) {
