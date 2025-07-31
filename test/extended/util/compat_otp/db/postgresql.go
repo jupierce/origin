@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/openshift/origin/test/extended/util/compat_otp"
+	util "github.com/openshift/origin/test/extended/util"
 )
 
 // PostgreSQL is a PostgreSQL helper for executing commands.
@@ -31,7 +31,7 @@ func (m PostgreSQL) PodName() string {
 }
 
 // IsReady pings the PostgreSQL server.
-func (m PostgreSQL) IsReady(oc *util.CLI) (bool, error) {
+func (m PostgreSQL) IsReady(oc *CLI) (bool, error) {
 	conf, err := getPodConfig(oc.KubeClient().CoreV1().Pods(oc.Namespace()), m.podName)
 	if err != nil {
 		return false, err
@@ -50,7 +50,7 @@ func (m PostgreSQL) IsReady(oc *util.CLI) (bool, error) {
 }
 
 // Query executes an SQL query as an ordinary user and returns the result.
-func (m PostgreSQL) Query(oc *util.CLI, query string) (string, error) {
+func (m PostgreSQL) Query(oc *CLI, query string) (string, error) {
 	container, err := firstContainerName(oc.KubeClient().CoreV1().Pods(oc.Namespace()), m.podName)
 	if err != nil {
 		return "", err
@@ -66,7 +66,7 @@ func (m PostgreSQL) Query(oc *util.CLI, query string) (string, error) {
 }
 
 // QueryPrivileged executes an SQL query as a root user and returns the result.
-func (m PostgreSQL) QueryPrivileged(oc *util.CLI, query string) (string, error) {
+func (m PostgreSQL) QueryPrivileged(oc *CLI, query string) (string, error) {
 	container, err := firstContainerName(oc.KubeClient().CoreV1().Pods(oc.Namespace()), m.podName)
 	if err != nil {
 		return "", err
@@ -82,7 +82,7 @@ func (m PostgreSQL) QueryPrivileged(oc *util.CLI, query string) (string, error) 
 }
 
 // TestRemoteLogin will test whether we can login through to a remote database.
-func (m PostgreSQL) TestRemoteLogin(oc *util.CLI, hostAddress string) error {
+func (m PostgreSQL) TestRemoteLogin(oc *CLI, hostAddress string) error {
 	container, err := firstContainerName(oc.KubeClient().CoreV1().Pods(oc.Namespace()), m.podName)
 	if err != nil {
 		return err

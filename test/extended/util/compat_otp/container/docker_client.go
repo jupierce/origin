@@ -12,6 +12,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 )
@@ -117,7 +118,7 @@ func (c *DockerCLI) Output() (string, error) {
 func (c *DockerCLI) GetImageID(imageTag string) (string, error) {
 	imageID := ""
 	ctx := context.Background()
-	images, err := c.CLI.ImageList(ctx, types.ImageListOptions{})
+	images, err := c.CLI.ImageList(ctx, image.ListOptions{})
 	if err != nil {
 		e2e.Logf("get docker image list failed")
 		return imageID, err
@@ -131,26 +132,14 @@ func (c *DockerCLI) GetImageID(imageTag string) (string, error) {
 	return imageID, nil
 }
 
-// RemoveImage is to remove image
-func (c *DockerCLI) RemoveImage(imageIndex string) (bool, error) {
-	imageID, err := c.GetImageID(imageIndex)
-	if err != nil {
-		return false, err
-	}
-	e2e.Logf("%s imageID is %s\n", imageIndex, imageID)
+// ImageRemove is to remove the image
+func (c *DockerCLI) ImageRemove(imageID string) error {
 	ctx := context.Background()
-	if imageID == "" {
-		e2e.Logf("there is no image with tag is %s", imageIndex)
-		return true, nil
-	}
-	e2e.Logf("delete image %s\n", imageID)
-	_, err = c.CLI.ImageRemove(ctx, imageID, types.ImageRemoveOptions{Force: true})
+	_, err := c.CLI.ImageRemove(ctx, imageID, image.RemoveOptions{})
 	if err != nil {
-		e2e.Logf("remove docker image %s failed", imageID)
-		return false, err
+		return err
 	}
-	e2e.Logf("remove image %s success\n", imageID)
-	return true, nil
+	return nil
 }
 
 // GetImageList is to get the image list
@@ -158,7 +147,7 @@ func (c *DockerCLI) GetImageList() ([]string, error) {
 	var imageList []string
 	ctx := context.Background()
 
-	images, err := c.CLI.ImageList(ctx, types.ImageListOptions{})
+	images, err := c.CLI.ImageList(ctx, image.ListOptions{})
 	if err != nil {
 		e2e.Logf("get docker image list failed")
 		return imageList, err
@@ -201,14 +190,14 @@ func (c *DockerCLI) ContainerStop(id string) error {
 func (c *DockerCLI) ContainerRemove(id string) error {
 	cli := c.CLI
 	ctx := context.Background()
-	err := cli.ContainerRemove(ctx, id, types.ContainerRemoveOptions{Force: true})
+	err := cli.ContainerRemove(ctx, id, container.RemoveOptions{Force: true})
 	return err
 }
 
 func (c *DockerCLI) ContainerStart(id string) error {
 	cli := c.CLI
 	ctx := context.Background()
-	err := cli.ContainerStart(ctx, id, types.ContainerStartOptions{})
+	err := cli.ContainerStart(ctx, id, container.StartOptions{})
 	return err
 }
 

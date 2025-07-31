@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/openshift/origin/test/extended/util/compat_otp"
+	util "github.com/openshift/origin/test/extended/util"
 )
 
 // MongoDB is a MongoDB helper for executing commands.
@@ -25,7 +25,7 @@ func (m MongoDB) PodName() string {
 }
 
 // IsReady pings the MongoDB server.
-func (m MongoDB) IsReady(oc *util.CLI) (bool, error) {
+func (m MongoDB) IsReady(oc *CLI) (bool, error) {
 	return isReady(
 		oc,
 		m.podName,
@@ -35,7 +35,7 @@ func (m MongoDB) IsReady(oc *util.CLI) (bool, error) {
 }
 
 // Query executes a query as an ordinary user and returns the result.
-func (m MongoDB) Query(oc *util.CLI, query string) (string, error) {
+func (m MongoDB) Query(oc *CLI, query string) (string, error) {
 	return executeShellCommand(
 		oc,
 		m.podName,
@@ -44,17 +44,17 @@ func (m MongoDB) Query(oc *util.CLI, query string) (string, error) {
 }
 
 // QueryPrivileged queries the database as a privileged user.
-func (m MongoDB) QueryPrivileged(oc *util.CLI, query string) (string, error) {
+func (m MongoDB) QueryPrivileged(oc *CLI, query string) (string, error) {
 	return "", errors.New("not implemented")
 }
 
 // TestRemoteLogin tests whether it is possible to remote login to hostAddress.
-func (m MongoDB) TestRemoteLogin(oc *util.CLI, hostAddress string) error {
+func (m MongoDB) TestRemoteLogin(oc *CLI, hostAddress string) error {
 	return errors.New("not implemented")
 }
 
 // // QueryPrimary queries the database on primary node as a regular user.
-func (m MongoDB) QueryPrimary(oc *util.CLI, query string) (string, error) {
+func (m MongoDB) QueryPrimary(oc *CLI, query string) (string, error) {
 	return executeShellCommand(
 		oc,
 		m.podName,

@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/openshift/origin/test/extended/util/compat_otp"
+	util "github.com/openshift/origin/test/extended/util"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kcoreclient "k8s.io/client-go/kubernetes/typed/core/v1"
 )
@@ -40,7 +40,7 @@ func firstContainerName(c kcoreclient.PodInterface, podName string) (string, err
 	return pod.Spec.Containers[0].Name, nil
 }
 
-func isReady(oc *util.CLI, podName string, pingCommand, expectedOutput string) (bool, error) {
+func isReady(oc *CLI, podName string, pingCommand, expectedOutput string) (bool, error) {
 	out, err := executeShellCommand(oc, podName, pingCommand)
 	ok := strings.Contains(out, expectedOutput)
 	if !ok {
@@ -49,7 +49,7 @@ func isReady(oc *util.CLI, podName string, pingCommand, expectedOutput string) (
 	return ok, err
 }
 
-func executeShellCommand(oc *util.CLI, podName string, command string) (string, error) {
+func executeShellCommand(oc *CLI, podName string, command string) (string, error) {
 	out, err := oc.Run("exec").Args(podName, "--", "bash", "-c", command).Output()
 	if err != nil {
 		switch err.(type) {

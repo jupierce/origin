@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/openshift/origin/test/extended/util/compat_otp"
+	util "github.com/openshift/origin/test/extended/util"
 )
 
 // MySQL is a MySQL helper for executing commands.
@@ -31,7 +31,7 @@ func (m MySQL) PodName() string {
 }
 
 // IsReady pings the MySQL server.
-func (m MySQL) IsReady(oc *util.CLI) (bool, error) {
+func (m MySQL) IsReady(oc *CLI) (bool, error) {
 	conf, err := getPodConfig(oc.KubeClient().CoreV1().Pods(oc.Namespace()), m.podName)
 	if err != nil {
 		return false, err
@@ -55,7 +55,7 @@ func (m MySQL) IsReady(oc *util.CLI) (bool, error) {
 }
 
 // Query executes an SQL query as an ordinary user and returns the result.
-func (m MySQL) Query(oc *util.CLI, query string) (string, error) {
+func (m MySQL) Query(oc *CLI, query string) (string, error) {
 	container, err := firstContainerName(oc.KubeClient().CoreV1().Pods(oc.Namespace()), m.podName)
 	if err != nil {
 		return "", err
@@ -71,7 +71,7 @@ func (m MySQL) Query(oc *util.CLI, query string) (string, error) {
 }
 
 // QueryPrivileged executes an SQL query as a root user and returns the result.
-func (m MySQL) QueryPrivileged(oc *util.CLI, query string) (string, error) {
+func (m MySQL) QueryPrivileged(oc *CLI, query string) (string, error) {
 	container, err := firstContainerName(oc.KubeClient().CoreV1().Pods(oc.Namespace()), m.podName)
 	if err != nil {
 		return "", err
@@ -86,7 +86,7 @@ func (m MySQL) QueryPrivileged(oc *util.CLI, query string) (string, error) {
 }
 
 // TestRemoteLogin will test whether we can login through to a remote database.
-func (m MySQL) TestRemoteLogin(oc *util.CLI, hostAddress string) error {
+func (m MySQL) TestRemoteLogin(oc *CLI, hostAddress string) error {
 	container, err := firstContainerName(oc.KubeClient().CoreV1().Pods(oc.Namespace()), m.podName)
 	if err != nil {
 		return err

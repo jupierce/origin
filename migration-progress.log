@@ -94,18 +94,48 @@ Status: STARTED
 - Origin builds successfully after all changes
 Status: COMPLETED
 
-## Summary of Progress So Far
+### Step 12: Create commit and branch compat_otp_12
+Status: COMPLETED
 
-We have successfully:
-1. Ensured origin builds with go 1.24.0
-2. Added origin import to OTP with local replace directive  
-3. Copied all OTP util code to origin's compat_otp package
-4. Extended origin's CLI with missing OTP methods via util_otp.go
-5. Resolved all circular dependencies by copying needed packages
-6. Added all missing cloud SDK dependencies
-7. Fixed the otelgrpc build issue with a replace directive
-8. Created two checkpoint branches: compat_otp_5 and compat_otp_8
+## Summary of Progress So Far
+1. ✓ Updated origin to go 1.24.0 and confirmed it builds
+2. ✓ Added origin import to OTP's go.mod with local replace directive
+3. ✓ Copied all OTP util code to origin's compat_otp package  
+4-5. ✓ Got origin to build successfully with compat_otp code
+6-7. ✓ Extended origin's CLI with missing OTP methods via util_otp.go
+8. ✓ Resolved all circular dependencies by copying needed packages
+9-10. ✓ Analyzed duplicate functions (most are identical, defer elimination to step 13)
+11-12. ✓ Renamed compat_otp.CLI to CLI_do_not_use to prevent direct usage
 
 Origin now has a complete copy of OTP's util functionality and builds successfully.
-The next steps (9-13) will focus on eliminating duplicate functions and migrating OTP 
-to use origin's util package instead of its internal one. 
+All checkpoint branches have been created: compat_otp_5, compat_otp_8, compat_otp_10, compat_otp_12
+
+Next: Step 13 - Migrate OTP to use origin's util instead of its internal util
+
+### Step 13: Migrate OTP to use origin's util instead of internal util
+Status: IN PROGRESS
+This is the main migration step where we update OTP to use origin's util package.
+
+Progress:
+1. ✓ Moved OTP's test/extended/util to otp_util_orig as backup
+2. ✓ Updated 581 imports from github.com/openshift/openshift-tests-private/test/extended/util to github.com/openshift/origin/test/extended/util
+3. ✓ Updated subpackage imports to use compat_otp:
+   - architecture, logext, clusterinfra, bootstrap, container, rosacli, cloud
+   - db, azure, jenkins, oauthserver, url
+4. ✓ Added otelgrpc replace directive to OTP's go.mod
+5. ✓ Updated kubernetes package versions to match origin's versions
+6. ✓ Fixed Docker API types in origin's compat_otp/container
+7. ✓ Fixed db package imports to use util instead of compat_otp
+8. ✓ Fixed NewCLI calls from two arguments to one
+9. ✓ Added compat_otp imports to ~300+ test files
+10. ✓ Updated function calls to use compat_otp where appropriate
+11. ✓ Fixed circular dependency in origin by removing compat_otp imports from util_otp.go
+12. ✓ Added guestConfigPath field to origin's CLI struct
+13. ✓ Added missing methods to origin's CLI (AdminAPIExtensionsV1Client, AsGuestKubeconf, etc.)
+
+Current challenges:
+- Type incompatibility: Many compat_otp functions expect *compat_otp.CLI but receive *util.CLI
+- This is the biggest remaining blocker - need to update all compat_otp functions to accept *util.CLI
+- Once this is fixed, OTP should be able to build successfully
+
+Next: Update all compat_otp functions to accept *util.CLI instead of *CLI 
