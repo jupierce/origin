@@ -37,7 +37,7 @@ import (
 	projectv1 "github.com/openshift/api/project/v1"
 	configclient "github.com/openshift/client-go/config/clientset/versioned"
 	securityv1client "github.com/openshift/client-go/security/clientset/versioned"
-	"github.com/openshift/origin/test/extended/util/compat_otp/version"
+	version "github.com/openshift/origin/test/extended/util/compat_otp/version"
 )
 
 const (

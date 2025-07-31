@@ -75,9 +75,10 @@ import (
 	userv1client "github.com/openshift/client-go/user/clientset/versioned"
 )
 
-// CLI provides function to call the OpenShift CLI and Kubernetes and OpenShift
+// CLI_do_not_use provides function to call the OpenShift CLI and Kubernetes and OpenShift
 // clients.
-type CLI struct {
+// DEPRECATED: Use github.com/openshift/origin/test/extended/util.CLI instead
+type CLI_do_not_use struct {
 	execPath           string
 	verb               string
 	configPath         string
@@ -111,8 +112,8 @@ type resourceRef struct {
 // NewCLI initialize the upstream E2E framework and set the namespace to match
 // with the project name. Note that this function does not initialize the project
 // role bindings for the namespace.
-func NewCLI(project, adminConfigPath string) *CLI {
-	client := &CLI{}
+func NewCLI(project, adminConfigPath string) *CLI_do_not_use {
+	client := &CLI_do_not_use{}
 
 	// must be registered before
 	// - framework initialization which registers other Ginkgo setup nodes
@@ -136,8 +137,8 @@ func NewCLI(project, adminConfigPath string) *CLI {
 
 // NewCLIWithoutNamespace initialize the upstream E2E framework without adding a
 // namespace. You may call SetupProject() to create one.
-func NewCLIWithoutNamespace(project string) *CLI {
-	client := &CLI{}
+func NewCLIWithoutNamespace(project string) *CLI_do_not_use {
+	client := &CLI_do_not_use{}
 
 	// must be registered before framework initialization which registers other Ginkgo setup nodes
 	g.BeforeEach(func() { SkipOnOpenShiftNess(true) })
@@ -155,8 +156,8 @@ func NewCLIWithoutNamespace(project string) *CLI {
 }
 
 // NewCLIForKube initializes a *CLI object which works against Kubernetes clusters.
-func NewCLIForKube(basename string) *CLI {
-	client := &CLI{}
+func NewCLIForKube(basename string) *CLI_do_not_use {
+	client := &CLI_do_not_use{}
 
 	// must be registered before framework initialization which registers other Ginkgo setup nodes
 	g.BeforeEach(func() { SkipOnOpenShiftNess(false) })
@@ -172,7 +173,7 @@ func NewCLIForKube(basename string) *CLI {
 }
 
 // NewCLIForKubeOpenShift initializes a *CLI object which works against Kubernetes AND OpenShift clusters.
-func NewCLIForKubeOpenShift(basename string) *CLI {
+func NewCLIForKubeOpenShift(basename string) *CLI_do_not_use {
 	switch IsKubernetesClusterFlag {
 	case "yes":
 		return NewCLIForKube(basename)
@@ -183,25 +184,25 @@ func NewCLIForKubeOpenShift(basename string) *CLI {
 
 // KubeFramework returns Kubernetes framework which contains helper functions
 // specific for Kubernetes resources
-func (c *CLI) KubeFramework() *e2e.Framework {
+func (c *CLI_do_not_use) KubeFramework() *e2e.Framework {
 	return c.kubeFramework
 }
 
 // Username returns the name of currently logged user. If there is no user assigned
 // for the current session, it returns 'admin'.
-func (c *CLI) Username() string {
+func (c *CLI_do_not_use) Username() string {
 	return c.username
 }
 
 // AsAdmin changes current config file path to the admin config.
-func (c *CLI) AsAdmin() *CLI {
+func (c *CLI_do_not_use) AsAdmin() *CLI_do_not_use {
 	nc := *c
 	nc.configPath = c.adminConfigPath
 	return &nc
 }
 
 // ChangeUser changes the user used by the current CLI session.
-func (c *CLI) ChangeUser(name string) *CLI {
+func (c *CLI_do_not_use) ChangeUser(name string) *CLI_do_not_use {
 	clientConfig := c.GetClientConfigForUser(name)
 
 	kubeConfig, err := createConfig(c.Namespace(), clientConfig)
@@ -225,7 +226,7 @@ func (c *CLI) ChangeUser(name string) *CLI {
 }
 
 // ChangeUserForKeycloakExtOIDC changes the user of current CLI session for an Keycloak external OIDC cluster
-func (c *CLI) ChangeUserForKeycloakExtOIDC() *CLI {
+func (c *CLI_do_not_use) ChangeUserForKeycloakExtOIDC() *CLI_do_not_use {
 	// IsKeycloakExtOIDCCluster() should be already called to ensure the KEYCLOAK_* env vars passed from Prow CI jobs exist
 	keycloakIssuer := os.Getenv("KEYCLOAK_ISSUER")
 	keycloakTestUsers := os.Getenv("KEYCLOAK_TEST_USERS")
@@ -352,7 +353,7 @@ func (c *CLI) ChangeUserForKeycloakExtOIDC() *CLI {
 }
 
 // SetNamespace sets a new namespace
-func (c *CLI) SetNamespace(ns string) *CLI {
+func (c *CLI_do_not_use) SetNamespace(ns string) *CLI_do_not_use {
 	c.kubeFramework.Namespace = &corev1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: ns,
@@ -364,7 +365,7 @@ func (c *CLI) SetNamespace(ns string) *CLI {
 // IsNamespacePrivileged returns bool
 // Judge whether the input namespace has the privileged label
 // Privileged label: "pod-security.kubernetes.io/enforce=privileged"
-func IsNamespacePrivileged(oc *CLI, namespace string) (bool, error) {
+func IsNamespacePrivileged(oc *CLI_do_not_use, namespace string) (bool, error) {
 	nsSecurityLabelValue, err := GetResourceSpecificLabelValue(oc, "ns/"+namespace, "", "pod-security\\.kubernetes\\.io/enforce")
 	if err != nil {
 		e2e.Logf(`Failed to get label "pod-security.kubernetes.io/enforce" value from ns/%s: "%v"`, namespace, err)
@@ -379,7 +380,7 @@ func IsNamespacePrivileged(oc *CLI, namespace string) (bool, error) {
 // Without audit label "pod-security.kubernetes.io/audit=privileged", an important alert will fire on cluster after pod created
 // https://github.com/openshift/cluster-kube-apiserver-operator/pull/1362
 // The warn label "pod-security.kubernetes.io/warn=privileged" is optional, it could make the warning info output gone.
-func SetNamespacePrivileged(oc *CLI, namespace string) error {
+func SetNamespacePrivileged(oc *CLI_do_not_use, namespace string) error {
 	_, labeledError := AddLabelsToSpecificResource(oc, "ns/"+namespace, "", "security.openshift.io/scc.podSecurityLabelSync=false",
 		"pod-security.kubernetes.io/enforce=privileged", "pod-security.kubernetes.io/audit=privileged", "pod-security.kubernetes.io/warn=privileged")
 	if labeledError != nil {
@@ -390,7 +391,7 @@ func SetNamespacePrivileged(oc *CLI, namespace string) error {
 }
 
 // RecoverNamespaceRestricted removes the privileged labels from the input namespace
-func RecoverNamespaceRestricted(oc *CLI, namespace string) error {
+func RecoverNamespaceRestricted(oc *CLI_do_not_use, namespace string) error {
 	_, unlabeledError := DeleteLabelsFromSpecificResource(oc, "ns/"+namespace, "", "security.openshift.io/scc.podSecurityLabelSync",
 		"pod-security.kubernetes.io/enforce", "pod-security.kubernetes.io/audit", "pod-security.kubernetes.io/warn")
 	if unlabeledError != nil {
@@ -400,65 +401,65 @@ func RecoverNamespaceRestricted(oc *CLI, namespace string) error {
 	return nil
 }
 
-func (c *CLI) GetKubeconf() string {
+func (c *CLI_do_not_use) GetKubeconf() string {
 	return c.configPath
 }
 
 // NotShowInfo instructs the command will not be logged
-func (c *CLI) NotShowInfo() *CLI {
+func (c *CLI_do_not_use) NotShowInfo() *CLI_do_not_use {
 	c.showInfo = false
 	return c
 }
 
 // SetShowInfo instructs the command will not be logged
-func (c *CLI) SetShowInfo() *CLI {
+func (c *CLI_do_not_use) SetShowInfo() *CLI_do_not_use {
 	c.showInfo = true
 	return c
 }
 
 // SetKubeconf instructs the cluster kubeconf file is set
-func (c *CLI) SetKubeconf(kubeconf string) *CLI {
+func (c *CLI_do_not_use) SetKubeconf(kubeconf string) *CLI_do_not_use {
 	c.configPath = kubeconf
 	return c
 }
 
 // SetGuestKubeconf instructs the guest cluster kubeconf file is set
-func (c *CLI) SetGuestKubeconf(guestKubeconf string) *CLI {
+func (c *CLI_do_not_use) SetGuestKubeconf(guestKubeconf string) *CLI_do_not_use {
 	c.guestConfigPath = guestKubeconf
 	return c
 }
 
 // GetGuestKubeconf gets the guest cluster kubeconf file
-func (c *CLI) GetGuestKubeconf() string {
+func (c *CLI_do_not_use) GetGuestKubeconf() string {
 	return c.guestConfigPath
 }
 
 // SetAdminKubeconf instructs the admin cluster kubeconf file is set
-func (c *CLI) SetAdminKubeconf(adminKubeconf string) *CLI {
+func (c *CLI_do_not_use) SetAdminKubeconf(adminKubeconf string) *CLI_do_not_use {
 	c.adminConfigPath = adminKubeconf
 	return c
 }
 
 // WithoutNamespace instructs the command should be invoked without adding --namespace parameter
-func (c CLI) WithoutNamespace() *CLI {
+func (c CLI_do_not_use) WithoutNamespace() *CLI_do_not_use {
 	c.withoutNamespace = true
 	return &c
 }
 
 // WithoutKubeconf instructs the command should be invoked without adding --kubeconfig parameter
-func (c CLI) WithoutKubeconf() *CLI {
+func (c CLI_do_not_use) WithoutKubeconf() *CLI_do_not_use {
 	c.withoutKubeconf = true
 	return &c
 }
 
 // WithKubectl instructs the command should be invoked with binary kubectl, not oc.
-func (c CLI) WithKubectl() *CLI {
+func (c CLI_do_not_use) WithKubectl() *CLI_do_not_use {
 	c.execPath = "kubectl"
 	return &c
 }
 
 // AsGuestKubeconf instructs the command should take kubeconfig of guest cluster
-func (c CLI) AsGuestKubeconf() *CLI {
+func (c CLI_do_not_use) AsGuestKubeconf() *CLI_do_not_use {
 	c.asGuestKubeconf = true
 	c.withoutNamespace = true // if you want to use guest cluster config to opeate guest cluster, you have to set
 	//withoutNamespace as true (like calling WithoutNamespace), so you can not get ns of
@@ -469,7 +470,7 @@ func (c CLI) AsGuestKubeconf() *CLI {
 // SetupProject initializes and transitions to a new project.
 // All resources created henceforth will reside within this project.
 // For clusters that are not using external OIDC, it also generates and switches to a random temporary user.
-func (c *CLI) SetupProject() {
+func (c *CLI_do_not_use) SetupProject() {
 	newNamespace := names.SimpleNameGenerator.GenerateName(fmt.Sprintf("e2e-test-%s-", c.kubeFramework.BaseName))
 	c.SetNamespace(newNamespace)
 
@@ -619,7 +620,7 @@ func (c *CLI) SetupProject() {
 
 // CreateNamespaceUDN creates a new namespace with required user defined network label during creation time only
 // required for testing networking UDN features on 4.17z+
-func (c *CLI) CreateNamespaceUDN() {
+func (c *CLI_do_not_use) CreateNamespaceUDN() {
 	newNamespace := names.SimpleNameGenerator.GenerateName(fmt.Sprintf("e2e-test-udn-%s-", c.kubeFramework.BaseName))
 	c.SetNamespace(newNamespace)
 	labelKey := "k8s.ovn.org/primary-user-defined-network"
@@ -641,7 +642,7 @@ func (c *CLI) CreateNamespaceUDN() {
 // CreateSpecificNamespaceUDN creates an UDN namespace with pre-defined name, and the namespace requires user defined network label during creation time only
 // required for testing networking UDN features on 4.17z+
 // Important Note:  the namespace created by this function will not be automatically deleted, user need to explicitly delete the namespace after test is done
-func (c *CLI) CreateSpecificNamespaceUDN(ns string) {
+func (c *CLI_do_not_use) CreateSpecificNamespaceUDN(ns string) {
 	c.SetNamespace(ns)
 	labelKey := "k8s.ovn.org/primary-user-defined-network"
 	labelValue := "null"
@@ -661,7 +662,7 @@ func (c *CLI) CreateSpecificNamespaceUDN(ns string) {
 // CreateProject creates a new project and assign a random user to the project.
 // All resources will be then created within this project.
 // TODO this should be removed.  It's only used by image tests.
-func (c *CLI) CreateProject() string {
+func (c *CLI_do_not_use) CreateProject() string {
 	newNamespace := names.SimpleNameGenerator.GenerateName(fmt.Sprintf("e2e-test-%s-", c.kubeFramework.BaseName))
 	e2e.Logf("Creating project %q", newNamespace)
 	_, err := c.ProjectClient().ProjectV1().ProjectRequests().Create(context.Background(), &projectv1.ProjectRequest{
@@ -687,7 +688,7 @@ func (c *CLI) CreateProject() string {
 }
 
 // TeardownProject removes projects created by this test.
-func (c *CLI) TeardownProject() {
+func (c *CLI_do_not_use) TeardownProject() {
 	e2e.TestContext.DumpLogsOnFailure = os.Getenv("DUMP_EVENTS_ON_FAILURE") != "false"
 	if len(c.Namespace()) > 0 && g.CurrentSpecReport().Failed() && e2e.TestContext.DumpLogsOnFailure {
 		e2edebug.DumpAllNamespaceInfo(context.TODO(), c.kubeFramework.ClientSet, c.Namespace())
@@ -709,12 +710,12 @@ func (c *CLI) TeardownProject() {
 }
 
 // CreateNamespace creates and returns a test namespace, automatically torn down after the test.
-func (c *CLI) CreateNamespace(ctx context.Context, labels map[string]string) (*corev1.Namespace, error) {
+func (c *CLI_do_not_use) CreateNamespace(ctx context.Context, labels map[string]string) (*corev1.Namespace, error) {
 	return c.KubeFramework().CreateNamespace(ctx, c.KubeFramework().BaseName, labels)
 }
 
 // MustCreateNamespace creates a test namespace and fails the test if creation fails.
-func (c *CLI) MustCreateNamespace(ctx context.Context, labels map[string]string) *corev1.Namespace {
+func (c *CLI_do_not_use) MustCreateNamespace(ctx context.Context, labels map[string]string) *corev1.Namespace {
 	ns, err := c.CreateNamespace(ctx, labels)
 	if err != nil {
 		FatalErr(fmt.Sprintf("failed to create namespace: %v", err))
@@ -723,167 +724,167 @@ func (c *CLI) MustCreateNamespace(ctx context.Context, labels map[string]string)
 }
 
 // CreateSpecifiedNamespaceAsAdmin creates specified name namespace.
-func (c *CLI) CreateSpecifiedNamespaceAsAdmin(namespace string) {
+func (c *CLI_do_not_use) CreateSpecifiedNamespaceAsAdmin(namespace string) {
 	err := c.AsAdmin().WithoutNamespace().Run("create").Args("namespace", namespace).Execute()
 	o.Expect(err).NotTo(o.HaveOccurred(), fmt.Sprintf("Failed to create namespace/%s", namespace))
 }
 
 // DeleteSpecifiedNamespaceAsAdmin deletes specified name namespace.
-func (c *CLI) DeleteSpecifiedNamespaceAsAdmin(namespace string) {
+func (c *CLI_do_not_use) DeleteSpecifiedNamespaceAsAdmin(namespace string) {
 	err := c.AsAdmin().WithoutNamespace().Run("delete").Args("namespace", namespace).Execute()
 	e2e.Logf("Deleted namespace/%s, err: %v", namespace, err)
 }
 
 // Verbose turns on printing verbose messages when executing OpenShift commands
-func (c *CLI) Verbose() *CLI {
+func (c *CLI_do_not_use) Verbose() *CLI_do_not_use {
 	c.verbose = true
 	return c
 }
 
 // RESTMapper method
-func (c *CLI) RESTMapper() meta.RESTMapper {
+func (c *CLI_do_not_use) RESTMapper() meta.RESTMapper {
 	ret := restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(c.KubeClient().Discovery()))
 	ret.Reset()
 	return ret
 }
 
 // AppsClient method
-func (c *CLI) AppsClient() appsv1client.Interface {
+func (c *CLI_do_not_use) AppsClient() appsv1client.Interface {
 	return appsv1client.NewForConfigOrDie(c.UserConfig())
 }
 
 // AuthorizationClient method
-func (c *CLI) AuthorizationClient() authorizationv1client.Interface {
+func (c *CLI_do_not_use) AuthorizationClient() authorizationv1client.Interface {
 	return authorizationv1client.NewForConfigOrDie(c.UserConfig())
 }
 
 // BuildClient method
-func (c *CLI) BuildClient() buildv1client.Interface {
+func (c *CLI_do_not_use) BuildClient() buildv1client.Interface {
 	return buildv1client.NewForConfigOrDie(c.UserConfig())
 }
 
 // ImageClient method
-func (c *CLI) ImageClient() imagev1client.Interface {
+func (c *CLI_do_not_use) ImageClient() imagev1client.Interface {
 	return imagev1client.NewForConfigOrDie(c.UserConfig())
 }
 
 // ProjectClient method
-func (c *CLI) ProjectClient() projectv1client.Interface {
+func (c *CLI_do_not_use) ProjectClient() projectv1client.Interface {
 	return projectv1client.NewForConfigOrDie(c.UserConfig())
 }
 
 // QuotaClient method
-func (c *CLI) QuotaClient() quotav1client.Interface {
+func (c *CLI_do_not_use) QuotaClient() quotav1client.Interface {
 	return quotav1client.NewForConfigOrDie(c.UserConfig())
 }
 
 // RouteClient method
-func (c *CLI) RouteClient() routev1client.Interface {
+func (c *CLI_do_not_use) RouteClient() routev1client.Interface {
 	return routev1client.NewForConfigOrDie(c.UserConfig())
 }
 
 // TemplateClient method
-func (c *CLI) TemplateClient() templatev1client.Interface {
+func (c *CLI_do_not_use) TemplateClient() templatev1client.Interface {
 	return templatev1client.NewForConfigOrDie(c.UserConfig())
 }
 
 // AdminAppsClient method
-func (c *CLI) AdminAppsClient() appsv1client.Interface {
+func (c *CLI_do_not_use) AdminAppsClient() appsv1client.Interface {
 	return appsv1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminAuthorizationClient method
-func (c *CLI) AdminAuthorizationClient() authorizationv1client.Interface {
+func (c *CLI_do_not_use) AdminAuthorizationClient() authorizationv1client.Interface {
 	return authorizationv1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminBuildClient method
-func (c *CLI) AdminBuildClient() buildv1client.Interface {
+func (c *CLI_do_not_use) AdminBuildClient() buildv1client.Interface {
 	return buildv1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminConfigClient method
-func (c *CLI) AdminConfigClient() configv1client.Interface {
+func (c *CLI_do_not_use) AdminConfigClient() configv1client.Interface {
 	return configv1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminImageClient method
-func (c *CLI) AdminImageClient() imagev1client.Interface {
+func (c *CLI_do_not_use) AdminImageClient() imagev1client.Interface {
 	return imagev1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminOauthClient method
-func (c *CLI) AdminOauthClient() oauthv1client.Interface {
+func (c *CLI_do_not_use) AdminOauthClient() oauthv1client.Interface {
 	return oauthv1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminOperatorClient method
-func (c *CLI) AdminOperatorClient() operatorv1client.Interface {
+func (c *CLI_do_not_use) AdminOperatorClient() operatorv1client.Interface {
 	return operatorv1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminProjectClient method
-func (c *CLI) AdminProjectClient() projectv1client.Interface {
+func (c *CLI_do_not_use) AdminProjectClient() projectv1client.Interface {
 	return projectv1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminQuotaClient method
-func (c *CLI) AdminQuotaClient() quotav1client.Interface {
+func (c *CLI_do_not_use) AdminQuotaClient() quotav1client.Interface {
 	return quotav1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminOAuthClient method
-func (c *CLI) AdminOAuthClient() oauthv1client.Interface {
+func (c *CLI_do_not_use) AdminOAuthClient() oauthv1client.Interface {
 	return oauthv1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminRouteClient method
-func (c *CLI) AdminRouteClient() routev1client.Interface {
+func (c *CLI_do_not_use) AdminRouteClient() routev1client.Interface {
 	return routev1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminUserClient method
-func (c *CLI) AdminUserClient() userv1client.Interface {
+func (c *CLI_do_not_use) AdminUserClient() userv1client.Interface {
 	return userv1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminSecurityClient method
-func (c *CLI) AdminSecurityClient() securityv1client.Interface {
+func (c *CLI_do_not_use) AdminSecurityClient() securityv1client.Interface {
 	return securityv1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // AdminTemplateClient method
-func (c *CLI) AdminTemplateClient() templatev1client.Interface {
+func (c *CLI_do_not_use) AdminTemplateClient() templatev1client.Interface {
 	return templatev1client.NewForConfigOrDie(c.AdminConfig())
 }
 
 // KubeClient provides a Kubernetes client for the current namespace
-func (c *CLI) KubeClient() kubernetes.Interface {
+func (c *CLI_do_not_use) KubeClient() kubernetes.Interface {
 	return kubernetes.NewForConfigOrDie(c.UserConfig())
 }
 
 // DynamicClient method
-func (c *CLI) DynamicClient() dynamic.Interface {
+func (c *CLI_do_not_use) DynamicClient() dynamic.Interface {
 	return dynamic.NewForConfigOrDie(c.UserConfig())
 }
 
 // AdminKubeClient provides a Kubernetes client for the cluster admin user.
-func (c *CLI) AdminKubeClient() kubernetes.Interface {
+func (c *CLI_do_not_use) AdminKubeClient() kubernetes.Interface {
 	return kubernetes.NewForConfigOrDie(c.AdminConfig())
 }
 
 // GuestKubeClient provides a Kubernetes client for the guest cluster user.
-func (c *CLI) GuestKubeClient() kubernetes.Interface {
+func (c *CLI_do_not_use) GuestKubeClient() kubernetes.Interface {
 	return kubernetes.NewForConfigOrDie(c.GuestConfig())
 }
 
 // AdminDynamicClient method
-func (c *CLI) AdminDynamicClient() dynamic.Interface {
+func (c *CLI_do_not_use) AdminDynamicClient() dynamic.Interface {
 	return dynamic.NewForConfigOrDie(c.AdminConfig())
 }
 
 // UserConfig method
-func (c *CLI) UserConfig() *rest.Config {
+func (c *CLI_do_not_use) UserConfig() *rest.Config {
 	clientConfig, err := getClientConfig(c.configPath)
 	if err != nil {
 		FatalErr(err)
@@ -892,7 +893,7 @@ func (c *CLI) UserConfig() *rest.Config {
 }
 
 // AdminConfig method
-func (c *CLI) AdminConfig() *rest.Config {
+func (c *CLI_do_not_use) AdminConfig() *rest.Config {
 	clientConfig, err := getClientConfig(c.adminConfigPath)
 	if err != nil {
 		FatalErr(err)
@@ -901,7 +902,7 @@ func (c *CLI) AdminConfig() *rest.Config {
 }
 
 // GuestConfig method
-func (c *CLI) GuestConfig() *rest.Config {
+func (c *CLI_do_not_use) GuestConfig() *rest.Config {
 	clientConfig, err := getClientConfig(c.guestConfigPath)
 	if err != nil {
 		FatalErr(err)
@@ -911,7 +912,7 @@ func (c *CLI) GuestConfig() *rest.Config {
 
 // Namespace returns the name of the namespace used in the current test case.
 // If the namespace is not set, an empty string is returned.
-func (c *CLI) Namespace() string {
+func (c *CLI_do_not_use) Namespace() string {
 	if c.kubeFramework.Namespace == nil {
 		return ""
 	}
@@ -919,22 +920,22 @@ func (c *CLI) Namespace() string {
 }
 
 // setOutput allows to override the default command output
-func (c *CLI) setOutput(out io.Writer) *CLI {
+func (c *CLI_do_not_use) setOutput(out io.Writer) *CLI_do_not_use {
 	c.stdout = out
 	return c
 }
 
 // AdminAPIExtensionsV1Client returns a ClientSet for the APIExtensionsV1Beta1 API
-func (c *CLI) AdminAPIExtensionsV1Client() crdv1.ApiextensionsV1Interface {
+func (c *CLI_do_not_use) AdminAPIExtensionsV1Client() crdv1.ApiextensionsV1Interface {
 	return crdv1.NewForConfigOrDie(c.AdminConfig())
 }
 
 // Run executes given OpenShift CLI command verb (iow. "oc <verb>").
 // This function also override the default 'stdout' to redirect all output
 // to a buffer and prepare the global flags such as namespace and config path.
-func (c *CLI) Run(commands ...string) *CLI {
+func (c *CLI_do_not_use) Run(commands ...string) *CLI_do_not_use {
 	in, out, errout := &bytes.Buffer{}, &bytes.Buffer{}, &bytes.Buffer{}
-	nc := &CLI{
+	nc := &CLI_do_not_use{
 		execPath:        c.execPath,
 		verb:            commands[0],
 		kubeFramework:   c.KubeFramework(),
@@ -968,7 +969,7 @@ func (c *CLI) Run(commands ...string) *CLI {
 
 // Template sets a Go template for the OpenShift CLI command.
 // This is equivalent of running "oc get foo -o template --template='{{ .spec }}'"
-func (c *CLI) Template(t string) *CLI {
+func (c *CLI_do_not_use) Template(t string) *CLI_do_not_use {
 	if c.verb != "get" {
 		FatalErr("Cannot use Template() for non-get verbs.")
 	}
@@ -979,19 +980,19 @@ func (c *CLI) Template(t string) *CLI {
 }
 
 // InputString adds expected input to the command
-func (c *CLI) InputString(input string) *CLI {
+func (c *CLI_do_not_use) InputString(input string) *CLI_do_not_use {
 	c.stdin.WriteString(input)
 	return c
 }
 
 // Args sets the additional arguments for the OpenShift CLI command
-func (c *CLI) Args(args ...string) *CLI {
+func (c *CLI_do_not_use) Args(args ...string) *CLI_do_not_use {
 	c.commandArgs = args
 	c.finalArgs = append(c.globalArgs, c.commandArgs...)
 	return c
 }
 
-func (c *CLI) printCmd() string {
+func (c *CLI_do_not_use) printCmd() string {
 	return strings.Join(c.finalArgs, " ")
 }
 
@@ -1003,7 +1004,7 @@ type ExitError struct {
 }
 
 // Output executes the command and returns stdout/stderr combined into one string
-func (c *CLI) Output() (string, error) {
+func (c *CLI_do_not_use) Output() (string, error) {
 	if c.verbose {
 		fmt.Printf("DEBUG: oc %s\n", c.printCmd())
 	}
@@ -1029,7 +1030,7 @@ func (c *CLI) Output() (string, error) {
 }
 
 // Outputs executes the command and returns the stdout/stderr output as separate strings
-func (c *CLI) Outputs() (string, string, error) {
+func (c *CLI_do_not_use) Outputs() (string, string, error) {
 	if c.verbose {
 		fmt.Printf("DEBUG: oc %s\n", c.printCmd())
 	}
@@ -1068,7 +1069,7 @@ func (c *CLI) Outputs() (string, string, error) {
 // which may be killed later via cmd.Process.Kill().  It also returns buffers
 // holding the stdout & stderr of the command, which may be read from only after
 // calling cmd.Wait().
-func (c *CLI) Background() (*exec.Cmd, *bytes.Buffer, *bytes.Buffer, error) {
+func (c *CLI_do_not_use) Background() (*exec.Cmd, *bytes.Buffer, *bytes.Buffer, error) {
 	if c.verbose {
 		fmt.Printf("DEBUG: oc %s\n", c.printCmd())
 	}
@@ -1088,7 +1089,7 @@ func (c *CLI) Background() (*exec.Cmd, *bytes.Buffer, *bytes.Buffer, error) {
 // object which may be killed later via cmd.Process.Kill().  It returns a
 // ReadCloser for stdout.  If in doubt, use Background().  Consult the os/exec
 // documentation.
-func (c *CLI) BackgroundRC() (*exec.Cmd, io.ReadCloser, error) {
+func (c *CLI_do_not_use) BackgroundRC() (*exec.Cmd, io.ReadCloser, error) {
 	if c.verbose {
 		fmt.Printf("DEBUG: oc %s\n", c.printCmd())
 	}
@@ -1106,7 +1107,7 @@ func (c *CLI) BackgroundRC() (*exec.Cmd, io.ReadCloser, error) {
 }
 
 // OutputToFile executes the command and store output to a file
-func (c *CLI) OutputToFile(filename string) (string, error) {
+func (c *CLI_do_not_use) OutputToFile(filename string) (string, error) {
 	content, err := c.Output()
 	if err != nil {
 		return "", err
@@ -1118,7 +1119,7 @@ func (c *CLI) OutputToFile(filename string) (string, error) {
 // OutputsToFiles executes the command and store the stdout in one file and stderr in another one
 // The stdout output will be written to fileName+'.stdout'
 // The stderr output will be written to fileName+'.stderr'
-func (c *CLI) OutputsToFiles(fileName string) (string, string, error) {
+func (c *CLI_do_not_use) OutputsToFiles(fileName string) (string, string, error) {
 	stdoutFilename := fileName + ".stdout"
 	stderrFilename := fileName + ".stderr"
 
@@ -1142,7 +1143,7 @@ func (c *CLI) OutputsToFiles(fileName string) (string, string, error) {
 
 // Execute executes the current command and return error if the execution failed
 // This function will set the default output to Ginkgo writer.
-func (c *CLI) Execute() error {
+func (c *CLI_do_not_use) Execute() error {
 	out, err := c.Output()
 	if _, err := io.Copy(g.GinkgoWriter, strings.NewReader(out+"\n")); err != nil {
 		fmt.Fprintln(os.Stderr, "ERROR: Unable to copy the output to ginkgo writer")
@@ -1159,22 +1160,22 @@ func FatalErr(msg interface{}) {
 }
 
 // AddExplicitResourceToDelete method
-func (c *CLI) AddExplicitResourceToDelete(resource schema.GroupVersionResource, namespace, name string) {
+func (c *CLI_do_not_use) AddExplicitResourceToDelete(resource schema.GroupVersionResource, namespace, name string) {
 	c.resourcesToDelete = append(c.resourcesToDelete, resourceRef{Resource: resource, Namespace: namespace, Name: name})
 }
 
 // AddResourceToDelete method
-func (c *CLI) AddResourceToDelete(resource schema.GroupVersionResource, metadata metav1.Object) {
+func (c *CLI_do_not_use) AddResourceToDelete(resource schema.GroupVersionResource, metadata metav1.Object) {
 	c.resourcesToDelete = append(c.resourcesToDelete, resourceRef{Resource: resource, Namespace: metadata.GetNamespace(), Name: metadata.GetName()})
 }
 
 // AddPathsToDelete method
-func (c *CLI) AddPathsToDelete(dir string) {
+func (c *CLI_do_not_use) AddPathsToDelete(dir string) {
 	c.pathsToDelete = append(c.pathsToDelete, dir)
 }
 
 // CreateUser method
-func (c *CLI) CreateUser(prefix string) *userv1.User {
+func (c *CLI_do_not_use) CreateUser(prefix string) *userv1.User {
 	user, err := c.AdminUserClient().UserV1().Users().Create(context.Background(), &userv1.User{
 		ObjectMeta: metav1.ObjectMeta{GenerateName: prefix + c.Namespace()},
 	}, metav1.CreateOptions{})
@@ -1187,7 +1188,7 @@ func (c *CLI) CreateUser(prefix string) *userv1.User {
 }
 
 // GetClientConfigForUser method
-func (c *CLI) GetClientConfigForUser(username string) *rest.Config {
+func (c *CLI_do_not_use) GetClientConfigForUser(username string) *rest.Config {
 	userClient := c.AdminUserClient()
 
 	user, err := userClient.UserV1().Users().Get(context.Background(), username, metav1.GetOptions{})
@@ -1239,7 +1240,7 @@ func (c *CLI) GetClientConfigForUser(username string) *rest.Config {
 }
 
 // GetClientConfigForExtOIDCUser gets a client config for an external OIDC cluster
-func (c *CLI) GetClientConfigForExtOIDCUser(tokenCacheDir string) *rest.Config {
+func (c *CLI_do_not_use) GetClientConfigForExtOIDCUser(tokenCacheDir string) *rest.Config {
 	userClientConfig := rest.AnonymousClientConfig(turnOffRateLimiting(rest.CopyConfig(c.AdminConfig())))
 	var oidcIssuerURL, oidcClientID, oidcCertCAPath string
 	if IsKeycloakExtOIDCCluster() {
@@ -1301,7 +1302,7 @@ func turnOffRateLimiting(config *rest.Config) *rest.Config {
 }
 
 // WaitForAccessAllowed method
-func (c *CLI) WaitForAccessAllowed(review *kubeauthorizationv1.SelfSubjectAccessReview, user string) error {
+func (c *CLI_do_not_use) WaitForAccessAllowed(review *kubeauthorizationv1.SelfSubjectAccessReview, user string) error {
 	if user == "system:anonymous" {
 		return waitForAccess(kubernetes.NewForConfigOrDie(rest.AnonymousClientConfig(c.AdminConfig())), true, review)
 	}
@@ -1314,7 +1315,7 @@ func (c *CLI) WaitForAccessAllowed(review *kubeauthorizationv1.SelfSubjectAccess
 }
 
 // WaitForAccessDenied method
-func (c *CLI) WaitForAccessDenied(review *kubeauthorizationv1.SelfSubjectAccessReview, user string) error {
+func (c *CLI_do_not_use) WaitForAccessDenied(review *kubeauthorizationv1.SelfSubjectAccessReview, user string) error {
 	if user == "system:anonymous" {
 		return waitForAccess(kubernetes.NewForConfigOrDie(rest.AnonymousClientConfig(c.AdminConfig())), false, review)
 	}
@@ -1375,7 +1376,7 @@ func defaultClientTransport(rt http.RoundTripper) http.RoundTripper {
 }
 
 // SilentOutput executes the command and returns stdout/stderr combined into one string
-func (c *CLI) SilentOutput() (string, error) {
+func (c *CLI_do_not_use) SilentOutput() (string, error) {
 	if c.verbose {
 		fmt.Printf("DEBUG: oc %s\n", c.printCmd())
 	}
@@ -1398,3 +1399,24 @@ func (c *CLI) SilentOutput() (string, error) {
 		return "", nil
 	}
 }
+
+// GetFirstDockerTag retrieves the first Docker tag from image repository resource
+func GetFirstDockerTag(c *rest.Config, imageNamespace, imageName string) (string, error) {
+	e2e.Logf("get docker tag from image %s/%s", imageNamespace, imageName)
+	imageClient, err := imagev1client.NewForConfig(c)
+	if err != nil {
+		return "", err
+	}
+	imageStream, err := imageClient.ImageV1().ImageStreams(imageNamespace).Get(context.Background(), imageName, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
+	e2e.Logf("get docker tag: %#v", imageStream.Status.DockerImageRepository)
+	if len(imageStream.Status.DockerImageRepository) == 0 {
+		return "", fmt.Errorf("cannot find docker tag for for image stream %s/%s", imageNamespace, imageName)
+	}
+	return imageStream.Status.DockerImageRepository, nil
+}
+
+// CLI is a type alias for backward compatibility within compat_otp package
+type CLI = CLI_do_not_use

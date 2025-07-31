@@ -10,8 +10,7 @@ import (
 	"time"
 
 	o "github.com/onsi/gomega"
-
-	"github.com/openshift/origin/test/extended/util/compat_otp/scheme"
+	scheme "github.com/openshift/origin/test/extended/util/compat_otp/scheme"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	e2e "k8s.io/kubernetes/test/e2e/framework"

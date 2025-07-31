@@ -8,7 +8,7 @@ import (
 // CreateServiceAccount
 // @Description	Create a service account when it does not exist
 // @Create 		jianl Jul 2 2025
-// @Param 		oc			exutil.CLI	oc client instance
+// @Param 		oc			exCLI	oc client instance
 // @Param 		account		string		The service account name
 // @Param 		clusterRole	string		The cluster role that the service account will be added to
 // @Return		(account token, error)
